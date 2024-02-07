@@ -1,0 +1,39 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+}
+
+#pong-game {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    border: 2px solid white;
+}
+
+.paddle, #ball {
+    position: absolute;
+    background-color: white;
+}
+
+.paddle {
+    width: 10px;
+    height: 70px;
+}
+
+#paddle1 {
+    left: 0;
+}
+
+#paddle2 {
+    right: 0;
+}
+
+#ball {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
