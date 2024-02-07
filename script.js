@@ -1,21 +1,126 @@
 const ball = document.getElementById('ball');
-const paddle1 = document.getElementById('paddle1');
-const paddle2 = document.getElementById('paddle2');
+const player = document.getElementById('player');
 const gameArea = document.getElementById('pong-game');
-const ballSpeed = 2;
+const gameOverScreen = document.createElement('div');
+
+let ballSpeed = 0;
 let ballX = gameArea.clientWidth / 2;
-let ballY = gameArea.clientHeight / 2;
-let paddleSpeed_AI = 2;
-let paddleSpeed_Player = 10;
-let ballXDirection = ballSpeed;
-let ballYDirection = ballSpeed;
-let paddle1Y = gameArea.clientHeight / 2;
-let paddle2Y = gameArea.clientHeight / 2;
-let paddle1Direction = 0;
+let ballY = gameArea.clientHeight / 2 - 50;
+let ballXDirection = 0;
+let ballYDirection = 0;
+
+let playerSpeed = 3;
+let playerX = gameArea.clientWidth / 2;
+let playerY = gameArea.clientHeight / 2 + 50;
+let playerXDirection = 0;
+let playerYDirection = 0;
 let isGameOver = false;
 let score = 0;
+let scoreTimer;
 
-function moveBall() {
+let collisionSteps = 10;
+
+// Create the game over screen
+gameOverScreen.id = 'game-over-screen';
+gameOverScreen.style.position = 'absolute';
+gameOverScreen.style.top = '0';
+gameOverScreen.style.left = '0';
+gameOverScreen.style.width = '100%';
+gameOverScreen.style.height = '100%';
+gameOverScreen.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+gameOverScreen.style.color = 'white';
+gameOverScreen.style.display = 'flex';
+gameOverScreen.style.justifyContent = 'center';
+gameOverScreen.style.alignItems = 'center';
+gameOverScreen.style.fontSize = '20px';
+gameOverScreen.style.display = 'none';
+document.body.appendChild(gameOverScreen);
+
+
+function move() {
+    if (isGameOver) {
+        gameOver();
+        return;
+    }
+
+    for (let i = 0; i < collisionSteps; i++) {
+        collisionCheck();
+    }
+
+    // Update player position
+    ball.style.left = ballX + 'px';
+    ball.style.top = ballY + 'px';
+    player.style.left = playerX + 'px';
+    player.style.top = playerY + 'px';
+
+
+
+
+    requestAnimationFrame(move);
+
+}
+
+
+function collisionCheck() {
+
+    playerX += playerXDirection / collisionSteps;
+    playerY += playerYDirection / collisionSteps;
+
+    if (playerY <= 0 || playerY >= gameArea.clientHeight - player.clientHeight) {
+        playerYDirection *= -1;
+    }
+    if (playerX <= 0 || playerX >= gameArea.clientWidth - player.clientWidth) {
+        playerXDirection *= -1;
+    }
+
+    let dx = playerX - ballX;
+    let dy = playerY - ballY;
+    let distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance > 3) {
+
+        let moveX = (dx / distance) * ballSpeed / collisionSteps;
+        let moveY = (dy / distance) * ballSpeed /collisionSteps;
+
+        ballX = Math.max(0, Math.min(gameArea.clientWidth - ball.clientWidth, ballX + moveX));
+        ballY = Math.max(0, Math.min(gameArea.clientHeight - ball.clientHeight, ballY + moveY));
+
+
+    }
+    else {
+        gameOver();
+    }
+
+
+}
+
+function movePlayer() {
+    if (isGameOver) {
+        gameOver();
+        return;
+    }
+
+
+
+
+
+    playerX += playerXDirection;
+    playerY += playerYDirection;
+
+    if (playerY <= 0 || playerY >= gameArea.clientHeight - player.clientHeight) {
+        playerYDirection *= -1;
+    }
+    if (playerX <= 0 || playerX >= gameArea.clientWidth - player.clientWidth) {
+        playerXDirection *= -1;
+    }
+
+    // Update player position
+    player.style.left = playerX + 'px';
+    player.style.top = playerY + 'px';
+
+    requestAnimationFrame(movePlayer);
+}
+/*function moveBall() {
     if (isGameOver) {
         return; // Stop the ball movement when the game is over
     }
@@ -40,10 +145,9 @@ function moveBall() {
         ballXDirection *= -1; // Reverse the ball's horizontal direction
     } else if (ballX < 0 || ballX > gameArea.clientWidth - ball.clientWidth) {
         // If the ball passes beyond the game area without hitting a paddle
-        gameOver(ballX < 0); // Pass true if player missed the ball
+        gameOver(ballX < 0); // Pass true if ball missed the ball
         return; // Exit the function to stop the game
     }
-
 
     // Update ball position
     ball.style.left = ballX + 'px';
@@ -61,86 +165,97 @@ function moveBall() {
 
     requestAnimationFrame(moveBall);
 }
+*/
 
-function gameOver(playerMissed) {
+function startScoreTimer() {
+    scoreTimer = setInterval(function() {
+        score++;
+        ballSpeed = Math.sqrt(score) / 2;
+        updateScore();
+    }, 1000); // Increase score every second
+}
+
+function updateScore() {
+    document.getElementById('score').innerText = 'Score: ' + score;
+}
+
+function stopScoreTimer() {
+    clearInterval(scoreTimer);
+}
+
+function gameOver() {
     isGameOver = true;
-    // Create a game over overlay
-    const gameOverScreen = document.createElement('div');
-    gameOverScreen.id = 'game-over-screen';
-    gameOverScreen.style.position = 'absolute';
-    gameOverScreen.style.top = '0';
-    gameOverScreen.style.left = '0';
-    gameOverScreen.style.width = '100%';
-    gameOverScreen.style.height = '100%';
-    gameOverScreen.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
-    gameOverScreen.style.color = 'white';
-    gameOverScreen.style.display = 'flex';
-    gameOverScreen.style.justifyContent = 'center';
-    gameOverScreen.style.alignItems = 'center';
-    gameOverScreen.style.fontSize = '20px';
-    gameOverScreen.textContent = playerMissed ? "It's Pong how tf did you lose?" : "How did you make the AI miss?";
-    document.body.appendChild(gameOverScreen);
-
-    // Optionally, add a click event listener to restart the game
-    gameOverScreen.addEventListener('click', function() {
-        document.body.removeChild(gameOverScreen);
-        restartGame(); // Function to reset the game state and start over
-    });
+    stopScoreTimer();
+    gameOverScreen.style.display = 'flex'; // Show the game over screen
+    gameOverScreen.textContent = "Man you suck. Score: " + score;
 }
 
 function restartGame() {
-    // Reset game state, ball position, and remove game over screen if present
-    isGameOver = false;
+    gameOverScreen.style.display = 'none';
+    ballSpeed = 0;
     ballX = gameArea.clientWidth / 2;
-    ballY = gameArea.clientHeight / 2;
-    // Reset other game variables as needed and start the ball movement again
-    moveBall();
-    // You may also need to reset paddle positions and scores as appropriate
+    ballY = gameArea.clientHeight / 2 - 50;
+    ballXDirection = 0;
+    ballYDirection = 0;
+
+    playerSpeed = 3;
+    playerX = gameArea.clientWidth / 2;
+    playerY = gameArea.clientHeight / 2 + 50;
+    playerXDirection = 0;
+    playerYDirection = 0;
+    isGameOver = false;
+    score = 0;
+    move();
+    startScoreTimer();
 }
 
 
-function movePaddle1() {
-    // Move paddle1 based on direction
-    if (paddle1Direction !== 0) {
-        paddle1Y += paddleSpeed_Player * paddle1Direction;
-        paddle1Y = Math.max(Math.min(paddle1Y, gameArea.clientHeight - paddle1.clientHeight), 0);
-        paddle1.style.top = paddle1Y + 'px';
+function moveBallTowardsPlayer() {
+    const dx = playerX - ballX;
+    const dy = playerY - ballY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance > 5) {
+        const moveX = (dx / distance) * ballSpeed;
+        const moveY = (dy / distance) * ballSpeed;
+
+        ballX = Math.max(0, Math.min(gameArea.clientWidth - ball.clientWidth, ballX + moveX));
+        ballY = Math.max(0, Math.min(gameArea.clientHeight - ball.clientHeight, ballY + moveY));
+
+        ball.style.left = ballX + 'px';
+        ball.style.top = ballY + 'px';
     }
-    requestAnimationFrame(movePaddle1);
+    else {
+        gameOver();
+    }
+
+    requestAnimationFrame(moveBallTowardsPlayer);
 }
+
+
 
 document.addEventListener('keydown', function(event) {
     switch(event.key) {
         case 'ArrowUp':
-            paddle1Direction = -1;
+            playerYDirection -= 1; //= Math.max(-ballSpeed - 3, playerYDirection - 1);
             break;
         case 'ArrowDown':
-            paddle1Direction = 1;
+            playerYDirection += 1; //= Math.min(ballSpeed + 3, playerYDirection + 1);
+            break;
+        case 'ArrowLeft':
+            playerXDirection -= 1; //= Math.max(-ballSpeed - 3, playerXDirection - 1);
+            break;
+        case 'ArrowRight':
+            playerXDirection += 1; //= Math.min(ballSpeed + 3, playerXDirection + 1);
             break;
     }
 });
 
-document.addEventListener('keyup', function(event) {
-    switch(event.key) {
-        case 'ArrowUp':
-        case 'ArrowDown':
-            paddle1Direction = 0;
-            break;
+document.addEventListener('click', function(event) {
+    if(isGameOver) {
+        restartGame()
     }
 });
 
-// Event listeners for paddle movement
-/*document.addEventListener('keydown', function(event) {
-    switch(event.key) {
-        case 'ArrowUp':
-            paddle1Y = Math.max(paddle1Y - paddleSpeed_Player, 0);
-            break;
-        case 'ArrowDown':
-            paddle1Y = Math.min(paddle1Y + paddleSpeed_Player, gameArea.clientHeight - paddle1.clientHeight);
-            break;
-    }
-    paddle1.style.top = paddle1Y + 'px';
-});*/
-
-moveBall();
-movePaddle1();
+move();
+startScoreTimer();
