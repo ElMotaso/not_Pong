@@ -17,7 +17,15 @@ body, html {
 
 
 
-#ball, #player {
+#ball {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: darkgreen;
+    border-radius: 50%;
+}
+
+#player {
     position: absolute;
     width: 10px;
     height: 10px;
