@@ -33,6 +33,25 @@ body, html {
     border-radius: 50%;
 }
 
+#game-over-screen {
+    position: absolute;
+    top: 20px; /* Adjust as needed for the desired padding from the top */
+    left: 20px; /* Adjust as needed for the desired padding from the left */
+    right: 20px; /* Adjust as needed for the desired padding from the right */
+    bottom: 20px; /* Adjust as needed for the desired padding from the bottom */
+    background-color: rgba(0, 0, 0, 0.75);
+    color: white;
+    display: none; /* Start with the game over screen hidden */
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start; /* Align items to the start (left) */
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: left;
+    overflow-wrap: break-word;
+    z-index: 10; /* Ensure it's above all other elements */
+}
+
 
 
 #score {

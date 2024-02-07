@@ -1,7 +1,8 @@
 const ball = document.getElementById('ball');
 const player = document.getElementById('player');
+const food = document.getElementById('food');
 const gameArea = document.getElementById('pong-game');
-const gameOverScreen = document.createElement('div');
+const gameOverScreen = document.getElementById('game-over-screen')
 
 let ballSpeed = 0;
 let ballX = gameArea.clientWidth / 2;
@@ -14,29 +15,26 @@ let playerX = gameArea.clientWidth / 2;
 let playerY = gameArea.clientHeight / 2 + 50;
 let playerXDirection = 0;
 let playerYDirection = 0;
+
 let isGameOver = false;
 let score = 0;
+let ballScore = 0;
+let highScore = localStorage.getItem('highScore') || 0;
+let losingMessageIndex = parseInt(localStorage.getItem('losingMessageIndex'), 10) || 0;
+let winningMessageIndex = parseInt(localStorage.getItem('winningMessageIndex'), 10) || 0;
 let scoreTimer;
 
+let foodX
+let foodY
+
 let collisionSteps = 10;
-
-// Create the game over screen
-gameOverScreen.id = 'game-over-screen';
-gameOverScreen.style.position = 'absolute';
-gameOverScreen.style.top = '0';
-gameOverScreen.style.left = '0';
-gameOverScreen.style.width = '100%';
-gameOverScreen.style.height = '100%';
-gameOverScreen.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
-gameOverScreen.style.color = 'white';
-gameOverScreen.style.display = 'flex';
-gameOverScreen.style.justifyContent = 'center';
-gameOverScreen.style.alignItems = 'center';
-gameOverScreen.style.fontSize = '20px';
-gameOverScreen.style.display = 'none';
-document.body.appendChild(gameOverScreen);
+let speedIncrement = 0.5;
 
 
+function startGame() {
+    startScoreTimer();
+    moveFood();
+}
 function move() {
     if (isGameOver) {
         gameOver();
@@ -52,8 +50,6 @@ function move() {
     ball.style.top = ballY + 'px';
     player.style.left = playerX + 'px';
     player.style.top = playerY + 'px';
-
-
 
 
     requestAnimationFrame(move);
@@ -73,104 +69,45 @@ function collisionCheck() {
         playerXDirection *= -1;
     }
 
-    let dx = playerX - ballX;
-    let dy = playerY - ballY;
+    const playerCenterX = playerX + player.clientWidth / 2;
+    const playerCenterY = playerY + player.clientHeight / 2;
+    const foodCenterX = foodX + food.clientWidth / 2;
+    const foodCenterY = foodY + food.clientHeight / 2;
+
+    let dx = playerCenterX - foodCenterX;
+    let dy = playerCenterY - foodCenterY;
     let distance = Math.sqrt(dx * dx + dy * dy);
 
-    if (distance > 3) {
-
-        let moveX = (dx / distance) * ballSpeed / collisionSteps;
-        let moveY = (dy / distance) * ballSpeed /collisionSteps;
-
-        ballX = Math.max(0, Math.min(gameArea.clientWidth - ball.clientWidth, ballX + moveX));
-        ballY = Math.max(0, Math.min(gameArea.clientHeight - ball.clientHeight, ballY + moveY));
-
-
+    // Now using radii for circular collision detection
+    if (distance < (player.clientWidth / 2 + food.clientWidth / 2)) {
+        score += 10;
+        ballScore = Math.max(0, ballScore - 5);
+        moveFood();
     }
-    else {
+
+    dx = playerCenterX - (ballX + ball.clientWidth / 2);
+    dy = playerCenterY - (ballY + ball.clientHeight / 2);
+    distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance <= (player.clientWidth / 2 + ball.clientWidth / 2)) {
         gameOver();
-    }
-
-
-}
-
-function movePlayer() {
-    if (isGameOver) {
-        gameOver();
-        return;
-    }
-
-
-
-
-
-    playerX += playerXDirection;
-    playerY += playerYDirection;
-
-    if (playerY <= 0 || playerY >= gameArea.clientHeight - player.clientHeight) {
-        playerYDirection *= -1;
-    }
-    if (playerX <= 0 || playerX >= gameArea.clientWidth - player.clientWidth) {
-        playerXDirection *= -1;
-    }
-
-    // Update player position
-    player.style.left = playerX + 'px';
-    player.style.top = playerY + 'px';
-
-    requestAnimationFrame(movePlayer);
-}
-/*function moveBall() {
-    if (isGameOver) {
-        return; // Stop the ball movement when the game is over
-    }
-
-    ballX += ballXDirection;
-    ballY += ballYDirection;
-
-    // Collision with top or bottom
-    if (ballY <= 0 || ballY >= gameArea.clientHeight - ball.clientHeight) {
-        ballYDirection *= -1;
-    }
-
-    let hitPaddle1 = ballX <= (paddle1.clientWidth + paddle1.offsetLeft) &&
-        ballY + ball.clientHeight >= paddle1.offsetTop &&
-        ballY <= (paddle1.offsetTop + paddle1.clientHeight);
-
-    let hitPaddle2 = ballX + ball.clientWidth >= paddle2.offsetLeft &&
-        ballY + ball.clientHeight >= paddle2.offsetTop &&
-        ballY <= (paddle2.offsetTop + paddle2.clientHeight);
-
-    if (hitPaddle1 || hitPaddle2) {
-        ballXDirection *= -1; // Reverse the ball's horizontal direction
-    } else if (ballX < 0 || ballX > gameArea.clientWidth - ball.clientWidth) {
-        // If the ball passes beyond the game area without hitting a paddle
-        gameOver(ballX < 0); // Pass true if ball missed the ball
-        return; // Exit the function to stop the game
-    }
-
-    // Update ball position
-    ball.style.left = ballX + 'px';
-    ball.style.top = ballY + 'px';
-
-    // Simple AI for paddle2
-    if (paddle2Y + paddle2.clientHeight / 2 < ballY) {
-        paddle2Y += paddleSpeed_AI;
     } else {
-        paddle2Y -= paddleSpeed_AI;
+        let moveX = (dx / distance) * ballSpeed / collisionSteps;
+        let moveY = (dy / distance) * ballSpeed / collisionSteps;
+
+        ballX += moveX;
+        ballY += moveY;
     }
 
-    paddle2.style.top = paddle2Y + 'px';
 
-
-    requestAnimationFrame(moveBall);
 }
-*/
+
 
 function startScoreTimer() {
     scoreTimer = setInterval(function() {
         score++;
-        ballSpeed = Math.sqrt(score) / 2;
+        ballScore++;
+        ballSpeed = Math.sqrt(ballScore)/2; //Math.max(speedIncrement, Math.sqrt(ballScore)/2);
         updateScore();
     }, 1000); // Increase score every second
 }
@@ -187,8 +124,80 @@ function gameOver() {
     isGameOver = true;
     stopScoreTimer();
     gameOverScreen.style.display = 'flex'; // Show the game over screen
-    gameOverScreen.textContent = "Man you suck. Score: " + score;
+    if(score < highScore){
+        gameOverScreen.innerHTML = losingMessage() + "<br>Score: " + score + "<br>" +
+            "Highscore: " + highScore;
+    } else {
+        gameOverScreen.innerHTML = winningMessage() + "<br>New highscore: " + score;
+        highScore = score;
+        localStorage.setItem('highScore', highScore);
+    }
+
 }
+
+function losingMessage() {
+    const messages = [
+        "Better luck next time!",
+        "So close.",
+        "I'm sure you'll get it.",
+        "That could have been better.",
+        "That attempt didn't quite hit the mark",
+        "At least you tried.",
+        "Have you ever played this game before?",
+        "Maybe this game is a tad too hard for you.",
+        "Did you understand the rules of this game?",
+        "Sometimes practice won't make perfect.",
+        "Why even play at this point?",
+        "My grandma has a higher score."
+    ]
+    //let index = Math.floor(Math.random() * messages.length);
+    let message = messages[losingMessageIndex];
+
+    // Increment the index for next time
+    losingMessageIndex++;
+
+    // Reset the index if it exceeds the number of messages
+    if (losingMessageIndex >= messages.length) {
+        losingMessageIndex = 0;
+    }
+
+    // Update the index in localStorage for persistence
+    localStorage.setItem('losingMessageIndex', losingMessageIndex);
+
+    // Return the selected message
+    return message;
+}
+
+function winningMessage() {
+    const messages = [
+        "Great start!",
+        "There were a few close calls, but you did it!",
+        "Living life to the fullest.",
+        "Does this make you happy?",
+        "You should go outside more often.",
+        "Don't you have any hobbies?",
+        "Sunlight's free, ever thought of trying it?",
+        "Ever wonder what productivity feels like?",
+        "What are your friends doing tonight?"
+    ]
+    //let index = Math.floor(Math.random() * messages.length);
+    let message = messages[winningMessageIndex];
+
+    // Increment the index for next time
+    winningMessageIndex++;
+
+    // Reset the index if it exceeds the number of messages
+    if (winningMessageIndex >= messages.length) {
+        winningMessageIndex = 0;
+    }
+
+    // Update the index in localStorage for persistence
+    localStorage.setItem('losingMessageIndex', winningMessageIndex);
+
+    // Return the selected message
+    return message;
+}
+
 
 function restartGame() {
     gameOverScreen.style.display = 'none';
@@ -205,31 +214,18 @@ function restartGame() {
     playerYDirection = 0;
     isGameOver = false;
     score = 0;
+    ballScore = 0;
     move();
-    startScoreTimer();
+    startGame();
 }
 
 
-function moveBallTowardsPlayer() {
-    const dx = playerX - ballX;
-    const dy = playerY - ballY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
 
-    if (distance > 5) {
-        const moveX = (dx / distance) * ballSpeed;
-        const moveY = (dy / distance) * ballSpeed;
-
-        ballX = Math.max(0, Math.min(gameArea.clientWidth - ball.clientWidth, ballX + moveX));
-        ballY = Math.max(0, Math.min(gameArea.clientHeight - ball.clientHeight, ballY + moveY));
-
-        ball.style.left = ballX + 'px';
-        ball.style.top = ballY + 'px';
-    }
-    else {
-        gameOver();
-    }
-
-    requestAnimationFrame(moveBallTowardsPlayer);
+function moveFood() {
+    foodX = Math.floor(Math.random() * (gameArea.clientWidth - 30) + 15);
+    foodY = Math.floor(Math.random() * (gameArea.clientHeight - 30) + 15);
+    food.style.left = foodX + 'px';
+    food.style.top = foodY + 'px';
 }
 
 
@@ -237,16 +233,16 @@ function moveBallTowardsPlayer() {
 document.addEventListener('keydown', function(event) {
     switch(event.key) {
         case 'ArrowUp':
-            playerYDirection -= 1; //= Math.max(-ballSpeed - 3, playerYDirection - 1);
+            playerYDirection -= speedIncrement; //= Math.max(-ballSpeed - 3, playerYDirection - 1);
             break;
         case 'ArrowDown':
-            playerYDirection += 1; //= Math.min(ballSpeed + 3, playerYDirection + 1);
+            playerYDirection += speedIncrement; //= Math.min(ballSpeed + 3, playerYDirection + 1);
             break;
         case 'ArrowLeft':
-            playerXDirection -= 1; //= Math.max(-ballSpeed - 3, playerXDirection - 1);
+            playerXDirection -= speedIncrement; //= Math.max(-ballSpeed - 3, playerXDirection - 1);
             break;
         case 'ArrowRight':
-            playerXDirection += 1; //= Math.min(ballSpeed + 3, playerXDirection + 1);
+            playerXDirection += speedIncrement; //= Math.min(ballSpeed + 3, playerXDirection + 1);
             break;
     }
 });
@@ -258,4 +254,4 @@ document.addEventListener('click', function(event) {
 });
 
 move();
-startScoreTimer();
+startGame()
