@@ -137,9 +137,6 @@ function gameOver() {
 
 function losingMessage() {
     const messages = [
-        "Better luck next time!",
-        "So close.",
-        "I'm sure you'll get it.",
         "That could have been better.",
         "That attempt didn't quite hit the mark",
         "At least you tried.",
@@ -170,8 +167,6 @@ function losingMessage() {
 
 function winningMessage() {
     const messages = [
-        "Great start!",
-        "There were a few close calls, but you did it!",
         "Living life to the fullest.",
         "Does this make you happy?",
         "You should go outside more often.",
