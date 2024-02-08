@@ -1,9 +1,13 @@
 const hunter = document.getElementById('hunter');
 const player = document.getElementById('player');
 const villain = document.getElementById('villain');
+const klatscher = document.getElementById('klatscher');
 const food = document.getElementById('food');
 const gameArea = document.getElementById('pong-game');
 const gameOverScreen = document.getElementById('game-over-screen')
+
+let blueThreshold = 100;
+let yellowThreshold = 50;
 
 let hunterSpeed;
 let hunterX;
@@ -17,6 +21,14 @@ let villainX;
 let villainY;
 let villainXDirection;
 let villainYDirection;
+
+
+let klatscherSpeed;
+let klatscherX;
+let klatscherY;
+let klatscherXDirection;
+let klatscherYDirection;
+let precentageIncrease;
 
 let playerX;
 let playerY;
@@ -52,6 +64,15 @@ function startGame() {
     villainXDirection = 0;
     villainYDirection = 0;
 
+    klatscherSpeed = 0;
+    klatscherX = gameArea.clientWidth / 2 - 75;
+    klatscherY = gameArea.clientHeight / 2;
+    klatscherXDirection = 0;
+    klatscherYDirection = 0;
+    klatscher.style.width = '10px'
+    klatscher.style.height = '10px'
+    precentageIncrease = 10;
+
     playerX = gameArea.clientWidth / 2;
     playerY = gameArea.clientHeight / 2;
     playerXDirection = 0;
@@ -72,7 +93,7 @@ function move() {
     }
 
     for (let i = 0; i < collisionSteps; i++) {
-        collisionCheck();
+        frame();
     }
 
     hunter.style.left = hunterX + 'px';
@@ -80,8 +101,9 @@ function move() {
     player.style.left = playerX + 'px';
     player.style.top = playerY + 'px';
     villain.style.left = villainX + 'px';
-    console.log(2, villainX)
     villain.style.top = villainY + 'px';
+    klatscher.style.left = klatscherX + 'px';
+    klatscher.style.top = klatscherY + 'px';
 
 
     requestAnimationFrame(move);
@@ -89,7 +111,17 @@ function move() {
 }
 
 
-function collisionCheck() {
+function frame() {
+    if (score >= blueThreshold) {
+        klatscherX += klatscherXDirection / collisionSteps;
+        klatscherY += klatscherYDirection / collisionSteps;
+    }
+    if (klatscherY <= 0 || klatscherY >= gameArea.clientHeight - klatscher.clientHeight) {
+        klatscherYDirection *= -1;
+    }
+    if (klatscherX <= 0 || klatscherX >= gameArea.clientWidth - klatscher.clientWidth) {
+        klatscherXDirection *= -1;
+    }
 
     // player
     playerX += playerXDirection / collisionSteps;
@@ -108,12 +140,30 @@ function collisionCheck() {
     const hunterCenterY = hunterY + hunter.clientHeight / 2;
     const villainCenterX = villainX + villain.clientWidth / 2;
     const villainCenterY = villainY + villain.clientHeight / 2
+    const klatscherCenterX = klatscherX + klatscher.clientWidth / 2;
+    const klatscherCenterY = klatscherY + klatscher.clientHeight / 2
     const foodCenterX = foodX + food.clientWidth / 2;
     const foodCenterY = foodY + food.clientHeight / 2;
+    let dx;
+    let dy;
+    let distance;
 
-    let dx = playerCenterX - foodCenterX;
-    let dy = playerCenterY - foodCenterY;
-    let distance = Math.sqrt(dx * dx + dy * dy);
+    dx = playerCenterX - klatscherCenterX;
+    dy = playerCenterY - klatscherCenterY;
+    distance = Math.sqrt(dx * dx + dy * dy);
+    if(distance <= (player.clientWidth / 2 + klatscher.clientWidth / 2) && score >= blueThreshold) {
+        let cacheX = klatscherXDirection;
+        let casheY = klatscherYDirection;
+        klatscherXDirection = playerXDirection;
+        playerXDirection = cacheX;
+        klatscherYDirection = playerYDirection;
+        playerYDirection = casheY;
+    }
+
+
+    dx = playerCenterX - foodCenterX;
+    dy = playerCenterY - foodCenterY;
+    distance = Math.sqrt(dx * dx + dy * dy);
 
     if (distance <= (player.clientWidth / 2 + food.clientWidth / 2)) {
         score += 10;
@@ -136,24 +186,39 @@ function collisionCheck() {
         hunterY += moveY;
     }
 
+    if (score > yellowThreshold){
+        dx = foodCenterX - villainCenterX;
+        dy = foodCenterY - villainCenterY;
+        distance = Math.sqrt(dx * dx + dy * dy);
 
-    dx = foodCenterX - villainCenterX;
-    dy = foodCenterY - villainCenterY;
-    distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < (villain.clientWidth / 2 + food.clientWidth / 2)) {
+            moveFood();
+            increaseKlatscher();
+            hunterScore += 5;
+        }
 
-    if (distance < (villain.clientWidth / 2 + food.clientWidth / 2)) {
-        moveFood();
-        hunterScore += 5;
+        let moveX = (dx / distance) * villainSpeed / collisionSteps;
+        let moveY = (dy / distance) * villainSpeed / collisionSteps;
+
+        villainX += moveX;
+        villainY += moveY;
     }
 
-    let moveX = (dx / distance) * villainSpeed / collisionSteps;
-    let moveY = (dy / distance) * villainSpeed / collisionSteps;
-
-    villainX += moveX;
-    villainY += moveY;
 
 }
 
+function increaseKlatscher() {
+    const currentWidth = klatscher.offsetWidth;
+    const currentHeight = klatscher.offsetHeight;
+
+    // Calculate the increase
+    const widthIncrease = currentWidth * (precentageIncrease / 100);
+    const heightIncrease = currentHeight * (precentageIncrease / 100);
+
+    // Apply the new size
+    klatscher.style.width = `${currentWidth + widthIncrease}px`;
+    klatscher.style.height = `${currentHeight + heightIncrease}px`;
+}
 
 function startScoreTimer() {
     scoreTimer = setInterval(function() {

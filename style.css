@@ -38,7 +38,15 @@ body, html {
     position: absolute;
     width: 10px;
     height: 10px;
-    background-color: yellow;
+    background-color: #a48e02;
+    border-radius: 50%;
+}
+
+#klatscher {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: cornflowerblue;
     border-radius: 50%;
 }
 
