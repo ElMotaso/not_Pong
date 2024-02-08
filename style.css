@@ -17,7 +17,7 @@ body, html {
 
 
 
-#ball {
+#hunter {
     position: absolute;
     width: 10px;
     height: 10px;
@@ -25,11 +25,20 @@ body, html {
     border-radius: 50%;
 }
 
+
 #player {
     position: absolute;
     width: 10px;
     height: 10px;
     background-color: white;
+    border-radius: 50%;
+}
+
+#villain {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: yellow;
     border-radius: 50%;
 }
 

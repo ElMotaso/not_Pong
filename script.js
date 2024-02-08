@@ -1,40 +1,70 @@
-const ball = document.getElementById('ball');
+const hunter = document.getElementById('hunter');
 const player = document.getElementById('player');
+const villain = document.getElementById('villain');
 const food = document.getElementById('food');
 const gameArea = document.getElementById('pong-game');
 const gameOverScreen = document.getElementById('game-over-screen')
 
-let ballSpeed = 0;
-let ballX = gameArea.clientWidth / 2;
-let ballY = gameArea.clientHeight / 2 - 50;
-let ballXDirection = 0;
-let ballYDirection = 0;
+let hunterSpeed;
+let hunterX;
+let hunterY;
+let hunterXDirection;
+let hunterYDirection;
 
-let playerSpeed = 3;
-let playerX = gameArea.clientWidth / 2;
-let playerY = gameArea.clientHeight / 2 + 50;
-let playerXDirection = 0;
-let playerYDirection = 0;
+
+let villainSpeed;
+let villainX;
+let villainY;
+let villainXDirection;
+let villainYDirection;
+
+let playerX;
+let playerY;
+let playerXDirection;
+let playerYDirection;
 
 let isGameOver = false;
-let score = 0;
-let ballScore = 0;
+let score;
+let hunterScore;
 let highScore = localStorage.getItem('highScore') || 0;
 let losingMessageIndex = parseInt(localStorage.getItem('losingMessageIndex'), 10) || 0;
 let winningMessageIndex = parseInt(localStorage.getItem('winningMessageIndex'), 10) || 0;
 let scoreTimer;
 
-let foodX
-let foodY
+let foodX;
+let foodY;
 
 let collisionSteps = 10;
 let speedIncrement = 0.5;
 
 
 function startGame() {
-    startScoreTimer();
+    gameOverScreen.style.display = 'none';
+    hunterSpeed = 0;
+    hunterX = gameArea.clientWidth / 2;
+    hunterY = gameArea.clientHeight / 2 - 75;
+    hunterXDirection = 0;
+    hunterYDirection = 0;
+
+    villainSpeed = 0;
+    villainX = gameArea.clientWidth / 2;
+    villainY = gameArea.clientHeight / 2 + 75;
+    villainXDirection = 0;
+    villainYDirection = 0;
+
+    playerX = gameArea.clientWidth / 2;
+    playerY = gameArea.clientHeight / 2;
+    playerXDirection = 0;
+    playerYDirection = 0;
+    isGameOver = false;
+    score = 0;
+    hunterScore = 0;
     moveFood();
+    move();
+    startScoreTimer();
 }
+
+
 function move() {
     if (isGameOver) {
         gameOver();
@@ -45,11 +75,13 @@ function move() {
         collisionCheck();
     }
 
-    // Update player position
-    ball.style.left = ballX + 'px';
-    ball.style.top = ballY + 'px';
+    hunter.style.left = hunterX + 'px';
+    hunter.style.top = hunterY + 'px';
     player.style.left = playerX + 'px';
     player.style.top = playerY + 'px';
+    villain.style.left = villainX + 'px';
+    console.log(2, villainX)
+    villain.style.top = villainY + 'px';
 
 
     requestAnimationFrame(move);
@@ -59,6 +91,7 @@ function move() {
 
 function collisionCheck() {
 
+    // player
     playerX += playerXDirection / collisionSteps;
     playerY += playerYDirection / collisionSteps;
 
@@ -71,6 +104,10 @@ function collisionCheck() {
 
     const playerCenterX = playerX + player.clientWidth / 2;
     const playerCenterY = playerY + player.clientHeight / 2;
+    const hunterCenterX = hunterX + hunter.clientWidth / 2;
+    const hunterCenterY = hunterY + hunter.clientHeight / 2;
+    const villainCenterX = villainX + villain.clientWidth / 2;
+    const villainCenterY = villainY + villain.clientHeight / 2
     const foodCenterX = foodX + food.clientWidth / 2;
     const foodCenterY = foodY + food.clientHeight / 2;
 
@@ -78,27 +115,42 @@ function collisionCheck() {
     let dy = playerCenterY - foodCenterY;
     let distance = Math.sqrt(dx * dx + dy * dy);
 
-    // Now using radii for circular collision detection
-    if (distance < (player.clientWidth / 2 + food.clientWidth / 2)) {
+    if (distance <= (player.clientWidth / 2 + food.clientWidth / 2)) {
         score += 10;
-        ballScore = Math.max(0, ballScore - 5);
+        hunterScore = Math.max(0, hunterScore - 5);
         moveFood();
     }
 
-    dx = playerCenterX - (ballX + ball.clientWidth / 2);
-    dy = playerCenterY - (ballY + ball.clientHeight / 2);
+
+    dx = playerCenterX - hunterCenterX;
+    dy = playerCenterY - hunterCenterY;
     distance = Math.sqrt(dx * dx + dy * dy);
 
-    if (distance <= (player.clientWidth / 2 + ball.clientWidth / 2)) {
+    if (distance <= (player.clientWidth / 2 + hunter.clientWidth / 2)) {
         gameOver();
     } else {
-        let moveX = (dx / distance) * ballSpeed / collisionSteps;
-        let moveY = (dy / distance) * ballSpeed / collisionSteps;
+        let moveX = (dx / distance) * hunterSpeed / collisionSteps;
+        let moveY = (dy / distance) * hunterSpeed / collisionSteps;
 
-        ballX += moveX;
-        ballY += moveY;
+        hunterX += moveX;
+        hunterY += moveY;
     }
 
+
+    dx = foodCenterX - villainCenterX;
+    dy = foodCenterY - villainCenterY;
+    distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance < (villain.clientWidth / 2 + food.clientWidth / 2)) {
+        moveFood();
+        hunterScore += 5;
+    }
+
+    let moveX = (dx / distance) * villainSpeed / collisionSteps;
+    let moveY = (dy / distance) * villainSpeed / collisionSteps;
+
+    villainX += moveX;
+    villainY += moveY;
 
 }
 
@@ -106,8 +158,9 @@ function collisionCheck() {
 function startScoreTimer() {
     scoreTimer = setInterval(function() {
         score++;
-        ballScore++;
-        ballSpeed = Math.sqrt(ballScore)/2; //Math.max(speedIncrement, Math.sqrt(ballScore)/2);
+        hunterScore++;
+        hunterSpeed = Math.sqrt(hunterScore)/2; //Math.max(speedIncrement, Math.sqrt(hunterScore)/2);
+        villainSpeed = hunterSpeed * 0.8;
         updateScore();
     }, 1000); // Increase score every second
 }
@@ -194,25 +247,7 @@ function winningMessage() {
 }
 
 
-function restartGame() {
-    gameOverScreen.style.display = 'none';
-    ballSpeed = 0;
-    ballX = gameArea.clientWidth / 2;
-    ballY = gameArea.clientHeight / 2 - 50;
-    ballXDirection = 0;
-    ballYDirection = 0;
 
-    playerSpeed = 3;
-    playerX = gameArea.clientWidth / 2;
-    playerY = gameArea.clientHeight / 2 + 50;
-    playerXDirection = 0;
-    playerYDirection = 0;
-    isGameOver = false;
-    score = 0;
-    ballScore = 0;
-    move();
-    startGame();
-}
 
 
 
@@ -224,29 +259,28 @@ function moveFood() {
 }
 
 
-
 document.addEventListener('keydown', function(event) {
     switch(event.key) {
         case 'ArrowUp':
-            playerYDirection -= speedIncrement; //= Math.max(-ballSpeed - 3, playerYDirection - 1);
+            playerYDirection -= speedIncrement; //= Math.max(-hunterSpeed - 3, playerYDirection - 1);
             break;
         case 'ArrowDown':
-            playerYDirection += speedIncrement; //= Math.min(ballSpeed + 3, playerYDirection + 1);
+            playerYDirection += speedIncrement; //= Math.min(hunterSpeed + 3, playerYDirection + 1);
             break;
         case 'ArrowLeft':
-            playerXDirection -= speedIncrement; //= Math.max(-ballSpeed - 3, playerXDirection - 1);
+            playerXDirection -= speedIncrement; //= Math.max(-hunterSpeed - 3, playerXDirection - 1);
             break;
         case 'ArrowRight':
-            playerXDirection += speedIncrement; //= Math.min(ballSpeed + 3, playerXDirection + 1);
+            playerXDirection += speedIncrement; //= Math.min(hunterSpeed + 3, playerXDirection + 1);
             break;
     }
 });
 
 document.addEventListener('click', function(event) {
     if(isGameOver) {
-        restartGame()
+        startGame()
     }
 });
 
-move();
-startGame()
+
+startGame();
