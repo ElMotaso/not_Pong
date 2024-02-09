@@ -308,7 +308,7 @@ function startScoreTimer() {
     scoreTimer = setInterval(function() {
         score++;
         hunterScore++;
-        hunterSpeed = 0 //Math.sqrt(hunterScore)/2; //Math.max(speedIncrement, Math.sqrt(hunterScore)/2);
+        hunterSpeed = Math.sqrt(hunterScore)/2; //Math.max(speedIncrement, Math.sqrt(hunterScore)/2);
         villainSpeed = hunterSpeed * 0.8;
         updateScore();
     }, 1000); // Increase score every second
@@ -401,8 +401,9 @@ function winningMessage() {
 
 
 function moveFood() {
-    foodX = Math.floor(Math.random() * (gameArea.clientWidth - 30) + 15);
-    foodY = Math.floor(Math.random() * (gameArea.clientHeight - 30) + 15);
+    foodX = Math.floor(Math.random() * (gameArea.clientWidth - food.clientWidth));
+    foodY = Math.floor(Math.random() * (gameArea.clientHeight - food.clientHeight));
+
     food.style.left = foodX + 'px';
     food.style.top = foodY + 'px';
 }
