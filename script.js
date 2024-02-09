@@ -7,6 +7,7 @@ const food = document.getElementById('food');
 const gameArea = document.getElementById('pong-game');
 const gameOverScreen = document.getElementById('game-over-screen')
 
+let purpleThreshold = 100;
 let blueThreshold = 66;
 let yellowThreshold = 33;
 let collisionSteps = 10;
@@ -83,8 +84,10 @@ function startGame() {
     unknownSpeed = 0;
     unknownX = gameArea.clientWidth / 2 + 75;
     unknownY = gameArea.clientHeight / 2;
-    unknownXDirection = 0;
-    unknownYDirection = 0;
+    unknownXDirection = -2;
+    unknownYDirection = 0.6;
+    unknown.style.width = '10px'
+    unknown.style.height = '10px'
 
     playerX = gameArea.clientWidth / 2;
     playerY = gameArea.clientHeight / 2;
@@ -140,6 +143,17 @@ function frame() {
         klatscherXDirection *= -1;
     }
 
+    if (score >= purpleThreshold) {
+        unknownX += unknownXDirection / collisionSteps;
+        unknownY += unknownYDirection / collisionSteps;
+    }
+    if (unknownY <= 0 || unknownY >= gameArea.clientHeight - unknown.clientHeight) {
+        unknownYDirection *= -1;
+    }
+    if (unknownX <= 0 || unknownX >= gameArea.clientWidth - unknown.clientWidth) {
+        unknownXDirection *= -1;
+    }
+
     // player
     playerX += playerXDirection / collisionSteps;
     playerY += playerYDirection / collisionSteps;
@@ -159,6 +173,8 @@ function frame() {
     const villainCenterY = villainY + villain.clientHeight / 2
     const klatscherCenterX = klatscherX + klatscher.clientWidth / 2;
     const klatscherCenterY = klatscherY + klatscher.clientHeight / 2
+    const unknownCenterX = unknownX + unknown.clientWidth / 2;
+    const unknownCenterY = unknownY + unknown.clientHeight / 2
     const foodCenterX = foodX + food.clientWidth / 2;
     const foodCenterY = foodY + food.clientHeight / 2;
     let dx;
@@ -175,6 +191,39 @@ function frame() {
         playerXDirection = cacheX;
         klatscherYDirection = playerYDirection;
         playerYDirection = casheY;
+    }
+
+    dx = klatscherCenterX - unknownCenterX;
+    dy = klatscherCenterY - unknownCenterY;
+    distance = Math.sqrt(dx * dx + dy * dy);
+    if(distance <= (klatscher.clientWidth / 2 + unknown.clientWidth / 2) && score >= purpleThreshold) {
+        let cacheX = unknownXDirection;
+        let casheY = unknownYDirection;
+        unknownXDirection = klatscherXDirection;
+        klatscherXDirection = cacheX;
+        unknownYDirection = klatscherYDirection;
+        klatscherYDirection = casheY;
+    }
+
+    dx = playerCenterX - unknownCenterX;
+    dy = playerCenterY - unknownCenterY;
+    distance = Math.sqrt(dx * dx + dy * dy);
+    if(distance <= (player.clientWidth / 2 + unknown.clientWidth / 2) && score >= purpleThreshold) {
+        gameOver()
+    }
+
+    dx = foodCenterX - unknownCenterX;
+    dy = foodCenterY - unknownCenterY;
+    distance = Math.sqrt(dx * dx + dy * dy);
+    if(distance <= (food.clientWidth / 2 + unknown.clientWidth / 2) && score >= purpleThreshold) {
+        if (blueThreshold) {
+            increaseKlatscher();
+        }
+        if (purpleThreshold) {
+            increaseUnknown();
+        }
+        hunterScore += 5;
+        moveFood()
     }
 
 
@@ -210,7 +259,12 @@ function frame() {
 
         if (distance < (villain.clientWidth / 2 + food.clientWidth / 2)) {
             moveFood();
-            increaseKlatscher();
+            if (blueThreshold) {
+                increaseKlatscher();
+            }
+            if (purpleThreshold) {
+                increaseUnknown();
+            }
             hunterScore += 5;
         }
 
@@ -237,11 +291,24 @@ function increaseKlatscher() {
     klatscher.style.height = `${currentHeight + heightIncrease}px`;
 }
 
+function increaseUnknown() {
+    const currentWidth = unknown.offsetWidth;
+    const currentHeight = unknown.offsetHeight;
+
+    // Calculate the increase
+    const widthIncrease = currentWidth * (precentageIncrease / 100);
+    const heightIncrease = currentHeight * (precentageIncrease / 100);
+
+    // Apply the new size
+    unknown.style.width = `${currentWidth + widthIncrease}px`;
+    unknown.style.height = `${currentHeight + heightIncrease}px`;
+}
+
 function startScoreTimer() {
     scoreTimer = setInterval(function() {
         score++;
         hunterScore++;
-        hunterSpeed = Math.sqrt(hunterScore)/2; //Math.max(speedIncrement, Math.sqrt(hunterScore)/2);
+        hunterSpeed = 0 //Math.sqrt(hunterScore)/2; //Math.max(speedIncrement, Math.sqrt(hunterScore)/2);
         villainSpeed = hunterSpeed * 0.8;
         updateScore();
     }, 1000); // Increase score every second
