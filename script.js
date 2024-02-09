@@ -438,5 +438,5 @@ document.addEventListener('click', function(event) {
     }
 });
 
-
+//important change
 startGame();
