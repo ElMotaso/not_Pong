@@ -2,12 +2,16 @@ const hunter = document.getElementById('hunter');
 const player = document.getElementById('player');
 const villain = document.getElementById('villain');
 const klatscher = document.getElementById('klatscher');
+const unknown = document.getElementById('unknown');
 const food = document.getElementById('food');
 const gameArea = document.getElementById('pong-game');
 const gameOverScreen = document.getElementById('game-over-screen')
 
-let blueThreshold = 100;
-let yellowThreshold = 50;
+let blueThreshold = 66;
+let yellowThreshold = 33;
+let collisionSteps = 10;
+let speedIncrement = 0.5;
+let precentageIncrease = 20;
 
 let hunterSpeed;
 let hunterX;
@@ -28,7 +32,13 @@ let klatscherX;
 let klatscherY;
 let klatscherXDirection;
 let klatscherYDirection;
-let precentageIncrease;
+
+let unknownSpeed;
+let unknownX;
+let unknownY;
+let unknownXDirection;
+let unknownYDirection;
+
 
 let playerX;
 let playerY;
@@ -46,8 +56,6 @@ let scoreTimer;
 let foodX;
 let foodY;
 
-let collisionSteps = 10;
-let speedIncrement = 0.5;
 
 
 function startGame() {
@@ -67,11 +75,16 @@ function startGame() {
     klatscherSpeed = 0;
     klatscherX = gameArea.clientWidth / 2 - 75;
     klatscherY = gameArea.clientHeight / 2;
-    klatscherXDirection = 0;
-    klatscherYDirection = 0;
+    klatscherXDirection = 2;
+    klatscherYDirection = 0.6;
     klatscher.style.width = '10px'
     klatscher.style.height = '10px'
-    precentageIncrease = 10;
+
+    unknownSpeed = 0;
+    unknownX = gameArea.clientWidth / 2 + 75;
+    unknownY = gameArea.clientHeight / 2;
+    unknownXDirection = 0;
+    unknownYDirection = 0;
 
     playerX = gameArea.clientWidth / 2;
     playerY = gameArea.clientHeight / 2;
@@ -80,6 +93,7 @@ function startGame() {
     isGameOver = false;
     score = 0;
     hunterScore = 0;
+
     moveFood();
     move();
     startScoreTimer();
@@ -104,6 +118,9 @@ function move() {
     villain.style.top = villainY + 'px';
     klatscher.style.left = klatscherX + 'px';
     klatscher.style.top = klatscherY + 'px';
+    unknown.style.left = unknownX + 'px';
+    unknown.style.top = unknownY + 'px';
+
 
 
     requestAnimationFrame(move);
@@ -323,6 +340,12 @@ function moveFood() {
     food.style.top = foodY + 'px';
 }
 
+function toggleMute() {
+    const music = document.getElementById("background-music");
+    const icon = document.getElementById("mute-icon");
+    music.muted = !music.muted;
+    icon.textContent = music.muted ? 'volume_off' : 'volume_up';
+}
 
 document.addEventListener('keydown', function(event) {
     switch(event.key) {

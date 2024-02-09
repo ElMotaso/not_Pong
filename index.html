@@ -3,16 +3,28 @@
 <head>
     <title>Pong Game for KaiOS</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
 <div id="pong-game">
     <div id="score">Score: <span id="timer-value">0</span></div>
+
     <div id="hunter"></div>
     <div id="player"></div>
     <div id="villain"></div>
     <div id="klatscher"></div>
+    <div id="unknown"></div>
     <div id="food"></div>
     <div id="game-over-screen"></div>
+    <audio id="background-music" loop autoplay muted>
+        <source src="soundtrack.m4a" type="audio/mp4">
+    </audio>
+    <button id="music-toggle" onclick="toggleMute()">
+        <span id="mute-icon" class="material-icons">volume_off</span>
+    </button>
+
+
+
 </div>
 <script src="script.js"></script>
 </body>

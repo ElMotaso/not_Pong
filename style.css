@@ -46,7 +46,15 @@ body, html {
     position: absolute;
     width: 10px;
     height: 10px;
-    background-color: cornflowerblue;
+    background-color: #294a88;
+    border-radius: 50%;
+}
+
+#unknown {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #531f83;
     border-radius: 50%;
 }
 
@@ -58,12 +66,13 @@ body, html {
     border-radius: 50%;
 }
 
+
 #game-over-screen {
     position: absolute;
-    top: 20px; /* Adjust as needed for the desired padding from the top */
-    left: 20px; /* Adjust as needed for the desired padding from the left */
-    right: 20px; /* Adjust as needed for the desired padding from the right */
-    bottom: 20px; /* Adjust as needed for the desired padding from the bottom */
+    top: 0px; /* Adjust as needed for the desired padding from the top */
+    left: 0px; /* Adjust as needed for the desired padding from the left */
+    right: 0px; /* Adjust as needed for the desired padding from the right */
+    bottom: 0px; /* Adjust as needed for the desired padding from the bottom */
     background-color: rgba(0, 0, 0, 0.75);
     color: white;
     display: none; /* Start with the game over screen hidden */
@@ -80,7 +89,18 @@ body, html {
 
 
 #score {
+    z-index: -1;
     color: white;
     font-size: 18px;
-    margin-bottom: 10px; /* Add some space below the timer */
+    margin-bottom: 10px;
+}
+
+#music-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: none;
+    color: white;
+    border: none;
+    cursor: pointer;
 }
