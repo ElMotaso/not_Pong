@@ -1,317 +1,60 @@
-const hunter = document.getElementById('hunter');
-const player = document.getElementById('player');
-const villain = document.getElementById('villain');
-const klatscher = document.getElementById('klatscher');
-const unknown = document.getElementById('unknown');
-const food = document.getElementById('food');
-const gameArea = document.getElementById('pong-game');
-const gameOverScreen = document.getElementById('game-over-screen')
-
-let purpleThreshold = 100;
-let blueThreshold = 66;
-let yellowThreshold = 33;
-let collisionSteps = 10;
-let speedIncrement = 0.5;
-let precentageIncrease = 20;
-
-let hunterSpeed;
-let hunterX;
-let hunterY;
-let hunterXDirection;
-let hunterYDirection;
-
-
-let villainSpeed;
-let villainX;
-let villainY;
-let villainXDirection;
-let villainYDirection;
-
-
-let klatscherSpeed;
-let klatscherX;
-let klatscherY;
-let klatscherXDirection;
-let klatscherYDirection;
-
-let unknownSpeed;
-let unknownX;
-let unknownY;
-let unknownXDirection;
-let unknownYDirection;
-
-
-let playerX;
-let playerY;
-let playerXDirection;
-let playerYDirection;
-
-let isGameOver = false;
-let score;
-let hunterScore;
-let highScore = localStorage.getItem('highScore') || 0;
-let losingMessageIndex = parseInt(localStorage.getItem('losingMessageIndex'), 10) || 0;
-let winningMessageIndex = parseInt(localStorage.getItem('winningMessageIndex'), 10) || 0;
-let scoreTimer;
-
-let foodX;
-let foodY;
 
 
 
-function startGame() {
-    gameOverScreen.style.display = 'none';
-    hunterSpeed = 0;
-    hunterX = gameArea.clientWidth / 2;
-    hunterY = gameArea.clientHeight / 2 - 75;
-    hunterXDirection = 0;
-    hunterYDirection = 0;
 
-    villainSpeed = 0;
-    villainX = gameArea.clientWidth / 2;
-    villainY = gameArea.clientHeight / 2 + 75;
-    villainXDirection = 0;
-    villainYDirection = 0;
+function startNewGame() {
+    player = new Ball("player",0, true, true, false, 0, gameArea.clientWidth / 2, gameArea.clientHeight / 2, 0, 0);
+    hunter = new Ball("hunter",0, false, false, true, 0, gameArea.clientWidth / 2, gameArea.clientHeight / 2 - 75, 0, 0);
+    villain = new Ball("villain",25, false, true, false, 0, gameArea.clientWidth / 2, gameArea.clientHeight / 2 + 75, 0, 0);
+    klatscher = new Ball("klatscher",50, true, false, false, 0, gameArea.clientWidth / 2 - 75, gameArea.clientHeight / 2, 2, 0.6);
+    unknown = new Ball("unknown",75, true, true, true, 0, gameArea.clientWidth / 2 + 75, gameArea.clientHeight / 2, -2, 0.6);
+    food = new Ball("food",0, false, false, false, 0, 100, 100, 0, 0);
 
-    klatscherSpeed = 0;
-    klatscherX = gameArea.clientWidth / 2 - 75;
-    klatscherY = gameArea.clientHeight / 2;
-    klatscherXDirection = 2;
-    klatscherYDirection = 0.6;
-    klatscher.style.width = '10px'
-    klatscher.style.height = '10px'
+    klatscher.resetSize();
+    unknown.resetSize();
 
-    unknownSpeed = 0;
-    unknownX = gameArea.clientWidth / 2 + 75;
-    unknownY = gameArea.clientHeight / 2;
-    unknownXDirection = -2;
-    unknownYDirection = 0.6;
-    unknown.style.width = '10px'
-    unknown.style.height = '10px'
-
-    playerX = gameArea.clientWidth / 2;
-    playerY = gameArea.clientHeight / 2;
-    playerXDirection = 0;
-    playerYDirection = 0;
     isGameOver = false;
+    gameOverScreen.style.display = 'none';
     score = 0;
     hunterScore = 0;
 
+    balls = [player, hunter, villain, klatscher, unknown, food];
+
+    setup();
     moveFood();
-    move();
+    clearInterval(scoreTimer);
     startScoreTimer();
+    gameLoop();
 }
 
-
-function move() {
-    if (isGameOver) {
-        gameOver();
-        return;
-    }
-
+function gameLoop() {
     for (let i = 0; i < collisionSteps; i++) {
-        frame();
-    }
-
-    hunter.style.left = hunterX + 'px';
-    hunter.style.top = hunterY + 'px';
-    player.style.left = playerX + 'px';
-    player.style.top = playerY + 'px';
-    villain.style.left = villainX + 'px';
-    villain.style.top = villainY + 'px';
-    klatscher.style.left = klatscherX + 'px';
-    klatscher.style.top = klatscherY + 'px';
-    unknown.style.left = unknownX + 'px';
-    unknown.style.top = unknownY + 'px';
-
-
-
-    requestAnimationFrame(move);
-
-}
-
-
-function frame() {
-    if (score >= blueThreshold) {
-        klatscherX += klatscherXDirection / collisionSteps;
-        klatscherY += klatscherYDirection / collisionSteps;
-    }
-    if (klatscherY <= 0 || klatscherY >= gameArea.clientHeight - klatscher.clientHeight) {
-        klatscherYDirection *= -1;
-    }
-    if (klatscherX <= 0 || klatscherX >= gameArea.clientWidth - klatscher.clientWidth) {
-        klatscherXDirection *= -1;
-    }
-
-    if (score >= purpleThreshold) {
-        unknownX += unknownXDirection / collisionSteps;
-        unknownY += unknownYDirection / collisionSteps;
-    }
-    if (unknownY <= 0 || unknownY >= gameArea.clientHeight - unknown.clientHeight) {
-        unknownYDirection *= -1;
-    }
-    if (unknownX <= 0 || unknownX >= gameArea.clientWidth - unknown.clientWidth) {
-        unknownXDirection *= -1;
-    }
-
-    // player
-    playerX += playerXDirection / collisionSteps;
-    playerY += playerYDirection / collisionSteps;
-
-    if (playerY <= 0 || playerY >= gameArea.clientHeight - player.clientHeight) {
-        playerYDirection *= -1;
-    }
-    if (playerX <= 0 || playerX >= gameArea.clientWidth - player.clientWidth) {
-        playerXDirection *= -1;
-    }
-
-    const playerCenterX = playerX + player.clientWidth / 2;
-    const playerCenterY = playerY + player.clientHeight / 2;
-    const hunterCenterX = hunterX + hunter.clientWidth / 2;
-    const hunterCenterY = hunterY + hunter.clientHeight / 2;
-    const villainCenterX = villainX + villain.clientWidth / 2;
-    const villainCenterY = villainY + villain.clientHeight / 2
-    const klatscherCenterX = klatscherX + klatscher.clientWidth / 2;
-    const klatscherCenterY = klatscherY + klatscher.clientHeight / 2
-    const unknownCenterX = unknownX + unknown.clientWidth / 2;
-    const unknownCenterY = unknownY + unknown.clientHeight / 2
-    const foodCenterX = foodX + food.clientWidth / 2;
-    const foodCenterY = foodY + food.clientHeight / 2;
-    let dx;
-    let dy;
-    let distance;
-
-    dx = playerCenterX - klatscherCenterX;
-    dy = playerCenterY - klatscherCenterY;
-    distance = Math.sqrt(dx * dx + dy * dy);
-    if(distance <= (player.clientWidth / 2 + klatscher.clientWidth / 2) && score >= blueThreshold) {
-        let cacheX = klatscherXDirection;
-        let casheY = klatscherYDirection;
-        klatscherXDirection = playerXDirection;
-        playerXDirection = cacheX;
-        klatscherYDirection = playerYDirection;
-        playerYDirection = casheY;
-    }
-
-    dx = klatscherCenterX - unknownCenterX;
-    dy = klatscherCenterY - unknownCenterY;
-    distance = Math.sqrt(dx * dx + dy * dy);
-    if(distance <= (klatscher.clientWidth / 2 + unknown.clientWidth / 2) && score >= purpleThreshold) {
-        let cacheX = unknownXDirection;
-        let casheY = unknownYDirection;
-        unknownXDirection = klatscherXDirection;
-        klatscherXDirection = cacheX;
-        unknownYDirection = klatscherYDirection;
-        klatscherYDirection = casheY;
-    }
-
-    dx = playerCenterX - unknownCenterX;
-    dy = playerCenterY - unknownCenterY;
-    distance = Math.sqrt(dx * dx + dy * dy);
-    if(distance <= (player.clientWidth / 2 + unknown.clientWidth / 2) && score >= purpleThreshold) {
-        gameOver()
-    }
-
-    dx = foodCenterX - unknownCenterX;
-    dy = foodCenterY - unknownCenterY;
-    distance = Math.sqrt(dx * dx + dy * dy);
-    if(distance <= (food.clientWidth / 2 + unknown.clientWidth / 2) && score >= purpleThreshold) {
-        if (blueThreshold) {
-            increaseKlatscher();
-        }
-        if (purpleThreshold) {
-            increaseUnknown();
-        }
-        hunterScore += 5;
-        moveFood()
-    }
-
-
-    dx = playerCenterX - foodCenterX;
-    dy = playerCenterY - foodCenterY;
-    distance = Math.sqrt(dx * dx + dy * dy);
-
-    if (distance <= (player.clientWidth / 2 + food.clientWidth / 2)) {
-        score += 10;
-        hunterScore = Math.max(0, hunterScore - 5);
-        moveFood();
-    }
-
-
-    dx = playerCenterX - hunterCenterX;
-    dy = playerCenterY - hunterCenterY;
-    distance = Math.sqrt(dx * dx + dy * dy);
-
-    if (distance <= (player.clientWidth / 2 + hunter.clientWidth / 2)) {
-        gameOver();
-    } else {
-        let moveX = (dx / distance) * hunterSpeed / collisionSteps;
-        let moveY = (dy / distance) * hunterSpeed / collisionSteps;
-
-        hunterX += moveX;
-        hunterY += moveY;
-    }
-
-    if (score > yellowThreshold){
-        dx = foodCenterX - villainCenterX;
-        dy = foodCenterY - villainCenterY;
-        distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < (villain.clientWidth / 2 + food.clientWidth / 2)) {
-            moveFood();
-            if (blueThreshold) {
-                increaseKlatscher();
+        for (const ball of balls) {
+            if (!isGameOver) {
+                ball.move()
             }
-            if (purpleThreshold) {
-                increaseUnknown();
-            }
-            hunterScore += 5;
         }
-
-        let moveX = (dx / distance) * villainSpeed / collisionSteps;
-        let moveY = (dy / distance) * villainSpeed / collisionSteps;
-
-        villainX += moveX;
-        villainY += moveY;
     }
-
-
+    if (!isGameOver) {
+        requestAnimationFrame(gameLoop)
+    }
 }
 
-function increaseKlatscher() {
-    const currentWidth = klatscher.offsetWidth;
-    const currentHeight = klatscher.offsetHeight;
-
-    // Calculate the increase
-    const widthIncrease = currentWidth * (precentageIncrease / 100);
-    const heightIncrease = currentHeight * (precentageIncrease / 100);
-
-    // Apply the new size
-    klatscher.style.width = `${currentWidth + widthIncrease}px`;
-    klatscher.style.height = `${currentHeight + heightIncrease}px`;
+function setup() {
+    for (const ball of balls) {
+        ball.place();
+    }
 }
 
-function increaseUnknown() {
-    const currentWidth = unknown.offsetWidth;
-    const currentHeight = unknown.offsetHeight;
-
-    // Calculate the increase
-    const widthIncrease = currentWidth * (precentageIncrease / 100);
-    const heightIncrease = currentHeight * (precentageIncrease / 100);
-
-    // Apply the new size
-    unknown.style.width = `${currentWidth + widthIncrease}px`;
-    unknown.style.height = `${currentHeight + heightIncrease}px`;
-}
 
 function startScoreTimer() {
     scoreTimer = setInterval(function() {
         score++;
         hunterScore++;
-        hunterSpeed = Math.sqrt(hunterScore)/2; //Math.max(speedIncrement, Math.sqrt(hunterScore)/2);
-        villainSpeed = hunterSpeed * 0.8;
+        hunter.speed = Math.sqrt(hunterScore)/2;
+        villain.speed = Math.sqrt(hunterScore)/2;
         updateScore();
-    }, 1000); // Increase score every second
+    }, 1000);
 }
 
 function updateScore() {
@@ -349,22 +92,8 @@ function losingMessage() {
         "Why even play at this point?",
         "My grandma has a higher score."
     ]
-    //let index = Math.floor(Math.random() * messages.length);
-    let message = messages[losingMessageIndex];
-
-    // Increment the index for next time
-    losingMessageIndex++;
-
-    // Reset the index if it exceeds the number of messages
-    if (losingMessageIndex >= messages.length) {
-        losingMessageIndex = 0;
-    }
-
-    // Update the index in localStorage for persistence
-    localStorage.setItem('losingMessageIndex', losingMessageIndex);
-
-    // Return the selected message
-    return message;
+    let index = Math.floor(Math.random() * messages.length);
+    return messages[index];
 }
 
 function winningMessage() {
@@ -377,35 +106,16 @@ function winningMessage() {
         "Ever wonder what productivity feels like?",
         "What are your friends doing tonight?"
     ]
-    //let index = Math.floor(Math.random() * messages.length);
-    let message = messages[winningMessageIndex];
-
-    // Increment the index for next time
-    winningMessageIndex++;
-
-    // Reset the index if it exceeds the number of messages
-    if (winningMessageIndex >= messages.length) {
-        winningMessageIndex = 0;
-    }
-
-    // Update the index in localStorage for persistence
-    localStorage.setItem('losingMessageIndex', winningMessageIndex);
-
-    // Return the selected message
-    return message;
+    let index = Math.floor(Math.random() * messages.length);
+    return messages[index];
 }
 
 
-
-
-
-
 function moveFood() {
-    foodX = Math.floor(Math.random() * (gameArea.clientWidth - food.clientWidth));
-    foodY = Math.floor(Math.random() * (gameArea.clientHeight - food.clientHeight));
-
-    food.style.left = foodX + 'px';
-    food.style.top = foodY + 'px';
+    let foodElement = document.getElementById(food.id)
+    food.xPos = Math.floor(Math.random() * (gameArea.clientWidth - foodElement.clientWidth));
+    food.yPos = Math.floor(Math.random() * (gameArea.clientHeight - foodElement.clientHeight));
+    food.place();
 }
 
 function toggleMute() {
@@ -418,25 +128,24 @@ function toggleMute() {
 document.addEventListener('keydown', function(event) {
     switch(event.key) {
         case 'ArrowUp':
-            playerYDirection -= speedIncrement; //= Math.max(-hunterSpeed - 3, playerYDirection - 1);
+            player.yDirection -= speedIncrement;
             break;
         case 'ArrowDown':
-            playerYDirection += speedIncrement; //= Math.min(hunterSpeed + 3, playerYDirection + 1);
+            player.yDirection += speedIncrement;
             break;
         case 'ArrowLeft':
-            playerXDirection -= speedIncrement; //= Math.max(-hunterSpeed - 3, playerXDirection - 1);
+            player.xDirection -= speedIncrement;
             break;
         case 'ArrowRight':
-            playerXDirection += speedIncrement; //= Math.min(hunterSpeed + 3, playerXDirection + 1);
+            player.xDirection += speedIncrement;
             break;
     }
 });
 
 document.addEventListener('click', function(event) {
     if(isGameOver) {
-        startGame()
+        startNewGame()
     }
 });
 
-//important change
-startGame();
+startNewGame();

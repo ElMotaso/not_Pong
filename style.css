@@ -21,7 +21,7 @@ body, html {
     position: absolute;
     width: 10px;
     height: 10px;
-    background-color: darkgreen;
+    background-color: #0e860e;
     border-radius: 50%;
 }
 
@@ -38,7 +38,7 @@ body, html {
     position: absolute;
     width: 10px;
     height: 10px;
-    background-color: #a48e02;
+    background-color: #ab960f;
     border-radius: 50%;
 }
 
@@ -46,7 +46,7 @@ body, html {
     position: absolute;
     width: 10px;
     height: 10px;
-    background-color: #294a88;
+    background-color: #355da9;
     border-radius: 50%;
 }
 
@@ -54,7 +54,7 @@ body, html {
     position: absolute;
     width: 10px;
     height: 10px;
-    background-color: #531f83;
+    background-color: #7636b2;
     border-radius: 50%;
 }
 
@@ -62,7 +62,7 @@ body, html {
     position: absolute;
     width: 30px;
     height: 30px;
-    background-color: darkred;
+    background-color: #9a0f0f;
     border-radius: 50%;
 }
 
