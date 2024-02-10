@@ -4,21 +4,37 @@
 
 function startNewGame() {
     player = new Ball("player",0, true, true, false, 0, gameArea.clientWidth / 2, gameArea.clientHeight / 2, 0, 0);
-    hunter = new Ball("hunter",0, false, false, true, 0, gameArea.clientWidth / 2, gameArea.clientHeight / 2 - 75, 0, 0);
-    villain = new Ball("villain",25, false, true, false, 0, gameArea.clientWidth / 2, gameArea.clientHeight / 2 + 75, 0, 0);
-    klatscher = new Ball("klatscher",50, true, false, false, 0, gameArea.clientWidth / 2 - 75, gameArea.clientHeight / 2, 2, 0.6);
-    unknown = new Ball("unknown",75, true, true, true, 0, gameArea.clientWidth / 2 + 75, gameArea.clientHeight / 2, -2, 0.6);
     food = new Ball("food",0, false, false, false, 0, 100, 100, 0, 0);
 
-    klatscher.resetSize();
-    unknown.resetSize();
+    if(isClassic()) {
+        hunter = new Ball("hunter",0, false, false, true, 0, gameArea.clientWidth / 2, gameArea.clientHeight / 2 - 75, 0, 0);
+        villain = new Ball("villain",25, false, true, false, 0, gameArea.clientWidth / 2, gameArea.clientHeight / 2 + 75, 0, 0);
+        klatscher = new Ball("klatscher",50, true, false, false, 0, gameArea.clientWidth / 2 - 75, gameArea.clientHeight / 2, 2, 0.6);
+        unknown = new Ball("unknown",75, true, true, true, 0, gameArea.clientWidth / 2 + 75, gameArea.clientHeight / 2, -2, 0.6);
+        balls = [player, hunter, villain, klatscher, unknown, food];
+    } else if(isChill()) {
+        hunter = new Ball("hunter",0, false, false, true, 0, gameArea.clientWidth / 2, gameArea.clientHeight / 2 - 75, 0, 0);
+        balls = [player, hunter, food];
+    } else if(isOverball()) {
+        hunter = new Ball("hunter",0, false, false, true, 0, gameArea.clientWidth / 2, gameArea.clientHeight / 2 - 75, 0, 0);
+        villain = new Ball("villain",0, false, true, false, 0, gameArea.clientWidth / 2, gameArea.clientHeight / 2 + 75, 0, 0);
+        klatscher = new Ball("klatscher",0, true, false, false, 0, gameArea.clientWidth / 2 - 75, gameArea.clientHeight / 2, 2, 0.6);
+        unknown = new Ball("unknown",0, true, true, true, 0, gameArea.clientWidth / 2 + 75, gameArea.clientHeight / 2, -2, 0.6);
+        balls = [player, hunter, villain, klatscher, unknown, food];
+    }
+
+    if(!isChill()) {
+        klatscher.resetSize();
+        unknown.resetSize();
+    }
 
     isGameOver = false;
     gameOverScreen.style.display = 'none';
     score = 0;
     hunterScore = 0;
+    villainScore = 0;
 
-    balls = [player, hunter, villain, klatscher, unknown, food];
+
 
     setup();
     moveFood();
@@ -42,6 +58,7 @@ function gameLoop() {
 
 function setup() {
     for (const ball of balls) {
+        document.getElementById(ball.id).style.display = 'flex';
         ball.place();
     }
 }
@@ -51,8 +68,11 @@ function startScoreTimer() {
     scoreTimer = setInterval(function() {
         score++;
         hunterScore++;
+        villainScore++;
         hunter.speed = Math.sqrt(hunterScore)/2;
-        villain.speed = Math.sqrt(hunterScore)/2;
+        if(!isChill()){
+            villain.speed = Math.sqrt(villainScore)/2 * 0.5;
+        }
         updateScore();
     }, 1000);
 }
@@ -68,14 +88,22 @@ function stopScoreTimer() {
 function gameOver() {
     isGameOver = true;
     stopScoreTimer();
-    gameOverScreen.style.display = 'flex'; // Show the game over screen
+    for (const ball of balls) {
+        document.getElementById(ball.id).style.display = 'none';
+    }
+    gameOverScreen.style.display = 'flex';
+    let message = document.getElementById('game-over-message');
+    let highScore = getHighScore();
     if(score < highScore){
-        gameOverScreen.innerHTML = losingMessage() + "<br>Score: " + score + "<br>" +
+        message.innerHTML =
+            losingMessage() + "<br>" +
+            "Score: " + score + "<br>" +
             "Highscore: " + highScore;
     } else {
-        gameOverScreen.innerHTML = winningMessage() + "<br>New highscore: " + score;
-        highScore = score;
-        localStorage.setItem('highScore', highScore);
+        message.innerHTML =
+            winningMessage() + "<br>" +
+            "New highscore: " + score;
+        setHighScore(score);
     }
 
 }
@@ -118,12 +146,7 @@ function moveFood() {
     food.place();
 }
 
-function toggleMute() {
-    const music = document.getElementById("background-music");
-    const icon = document.getElementById("mute-icon");
-    music.muted = !music.muted;
-    icon.textContent = music.muted ? 'volume_off' : 'volume_up';
-}
+
 
 document.addEventListener('keydown', function(event) {
     switch(event.key) {
@@ -142,10 +165,10 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
+/*
 document.addEventListener('click', function(event) {
     if(isGameOver) {
         startNewGame()
     }
 });
-
-startNewGame();
+*/

@@ -7,7 +7,8 @@ body, html {
     background-color: black;
 }
 
-#pong-game {
+#modes-menu, #pong-game, #menu {
+    display: none;
     position: relative;
     width: 320px;
     height: 480px;
@@ -16,8 +17,44 @@ body, html {
 }
 
 
+#menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+#start-game, #modes, #Stats, #restart, #game-to-menu {
+    background-color: transparent; /* Make the background invisible */
+    border: 2px solid white; /* White border */
+    border-radius: 20px; /* Rounded corners */
+    color: white; /* Text color */
+    padding: 10px 20px; /* Padding inside the buttons */
+    text-align: center; /* Center the text inside the button */
+    font-size: 16px; /* Text size */
+    cursor: pointer; /* Change mouse cursor on hover */
+    outline: none; /* Remove the outline to make it look cleaner */
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effects */
+    height: 50px;
+    width: 160px;
+}
+
+
+
+#start-game:hover, #modes:hover, #Stats:hover, #restart:hover, #game-to-menu:hover {
+    background-color: #414141; /* Slight background on hover */
+    color: #ffffff; /* Change text color slightly on hover */
+
+}
+
+.material-icons {
+    vertical-align: middle; /* Aligns icon vertically with text if any */
+}
+
 
 #hunter {
+    display: none;
+    z-index: 8;
     position: absolute;
     width: 10px;
     height: 10px;
@@ -27,6 +64,8 @@ body, html {
 
 
 #player {
+    display: none;
+    z-index: 9;
     position: absolute;
     width: 10px;
     height: 10px;
@@ -35,6 +74,8 @@ body, html {
 }
 
 #villain {
+    display: none;
+    z-index: 7;
     position: absolute;
     width: 10px;
     height: 10px;
@@ -43,6 +84,8 @@ body, html {
 }
 
 #klatscher {
+    display: none;
+    z-index: 6;
     position: absolute;
     width: 10px;
     height: 10px;
@@ -51,6 +94,8 @@ body, html {
 }
 
 #unknown {
+    display: none;
+    z-index: 5;
     position: absolute;
     width: 10px;
     height: 10px;
@@ -59,6 +104,7 @@ body, html {
 }
 
 #food {
+    display: none;
     position: absolute;
     width: 30px;
     height: 30px;
@@ -67,35 +113,37 @@ body, html {
 }
 
 
+
 #game-over-screen {
     position: absolute;
-    top: 0px; /* Adjust as needed for the desired padding from the top */
-    left: 0px; /* Adjust as needed for the desired padding from the left */
-    right: 0px; /* Adjust as needed for the desired padding from the right */
-    bottom: 0px; /* Adjust as needed for the desired padding from the bottom */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background-color: rgba(0, 0, 0, 0.75);
     color: white;
-    display: none; /* Start with the game over screen hidden */
+    display: none;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start; /* Align items to the start (left) */
+    align-items: center;
     padding: 20px;
     box-sizing: border-box;
     text-align: left;
     overflow-wrap: break-word;
-    z-index: 10; /* Ensure it's above all other elements */
+    z-index: 10;
+    width: 320px;
+    height: 480px;
+    gap: 10px;
 }
 
 
-
 #score {
-    z-index: -1;
     color: white;
     font-size: 18px;
     margin-bottom: 10px;
 }
 
-#music-toggle {
+#music-toggle-game, #music-toggle-menu, #music-toggle-modes {
     position: absolute;
     top: 0;
     right: 0;

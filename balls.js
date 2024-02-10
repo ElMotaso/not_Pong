@@ -38,8 +38,7 @@ class Ball {
     movement() {
         let element = document.getElementById(this.id);
 
-        // move player, klatscher and unkown
-        if ([player.id, klatscher.id, unknown.id].includes(this.id)) {
+        if (this.id === player.id || !isChill() && (this.id === klatscher.id || this.id === unknown.id)) {
             this.xPos += this.xDirection / collisionSteps;
             this.yPos += this.yDirection / collisionSteps;
 
@@ -56,7 +55,7 @@ class Ball {
             this.yPos += (dy / distance) * this.speed / collisionSteps;
 
             // move villain
-        } else if (this.id === "villain") {
+        } else if (!isChill() && this.id === villain.id) {
             let ballElement = document.getElementById(food.id)
             const foodCenterX = food.xPos + ballElement.clientWidth / 2;
             const foodCenterY = food.yPos + ballElement.clientHeight / 2;
@@ -76,20 +75,34 @@ class Ball {
                 this.xDirection *= -1;
             }
         }
+        if (this.yPos <= 0) {
+            this.yPos = 0;
+        }
+        if (this.yPos >= gameArea.clientHeight - element.clientHeight) {
+            this.yPos = gameArea.clientHeight - element.clientHeight;
+        }
+        if (this.xPos <= 0) {
+            this.xPos = 0;
+        }
+        if (this.xPos >= gameArea.clientWidth - element.clientWidth) {
+            this.xPos = gameArea.clientWidth - element.clientWidth;
+        }
     }
 
     collision(ball) {
         if (this.colliding(ball) && score > Math.max(this.threshold, ball.threshold)) {
-            if (this.kills && ball.id === player.id || this.id === player.id && ball.kills) {
+            if (this.kills && (ball.id === player.id || this.id === player.id)) {
                 gameOver()
             }
-            if (this.eats && ball.id === "food") {
-                if (this.id === "player") {
+            if (this.eats && ball.id === food.id) {
+                if (this.id === player.id) {
                     score += 10;
-                } else {
-                    hunterScore += 5;
-                    unknown.increase();
+                } else if (!isChill() && this.id === villain.id) {
+                    villainScore += 5;
                     klatscher.increase()
+                } else if (!isChill() && this.id === unknown.id) {
+                    hunterScore += 5;
+                    unknown.increase()
                 }
                 moveFood();
             }
@@ -125,14 +138,16 @@ class Ball {
         const element = document.getElementById(this.id);
         const currentWidth = element.offsetWidth;
         const currentHeight = element.offsetHeight;
+        if (Math.max(currentWidth, currentHeight) + precentageIncrease > Math.min(gameArea.clientWidth, gameArea.clientHeight)) {
+            return;
+        }
 
-        // Calculate the increase
-        const widthIncrease = currentWidth * (precentageIncrease / 100);
-        const heightIncrease = currentHeight * (precentageIncrease / 100);
+        const widthIncrease = precentageIncrease; //currentWidth * (precentageIncrease / 100);
+        const heightIncrease = precentageIncrease; //currentHeight * (precentageIncrease / 100);
 
-        // Apply the new size
         element.style.width = `${currentWidth + widthIncrease}px`;
         element.style.height = `${currentHeight + heightIncrease}px`;
+
     }
 
     resetSize() {

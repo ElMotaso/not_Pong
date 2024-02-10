@@ -6,27 +6,51 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
+
+<div id="menu">
+    <h1>Game Title</h1>
+    <button id="start-game" onclick="startClassic()">Start Game</button>
+    <button id="modes" onclick="menuToModes()">Modes</button>
+    <button id="Stats">Stats</button>
+    <audio id="background-music" loop autoplay muted>
+        <source src="soundtrack.m4a" type="audio/mp4">
+    </audio>
+    <button id="music-toggle-menu" onclick="toggleMute()">
+        <span id="mute-icon-menu" class="material-icons">volume_off</span>
+    </button>
+</div>
+
+<div id="modes-menu">
+    <h2>Modes</h2>
+    <button id="classic" onclick="startClassic()">Classic</button>
+    <button id="chill" onclick="startChill()">Chill</button>
+    <button id="overball" onclick="startOverball()">Overball</button>
+    <button id="modes-to-menu" onclick="modesToMenu()">Menu</button>
+    <button id="music-toggle-modes" onclick="toggleMute()">
+        <span id="mute-icon-modes" class="material-icons">volume_off</span>
+    </button>
+</div>
+
 <div id="pong-game">
     <div id="score">Score: <span id="timer-value">0</span></div>
-
     <div id="hunter"></div>
     <div id="player"></div>
     <div id="villain"></div>
     <div id="klatscher"></div>
     <div id="unknown"></div>
     <div id="food"></div>
-    <div id="game-over-screen"></div>
-    <audio id="background-music" loop autoplay muted>
-        <source src="soundtrack.m4a" type="audio/mp4">
-    </audio>
-    <button id="music-toggle" onclick="toggleMute()">
-        <span id="mute-icon" class="material-icons">volume_off</span>
+    <div id="game-over-screen">
+        <h3 id="game-over-message">Game Over</h3>
+        <button id="restart" onclick="startNewGame()">Restart</button>
+        <button id="game-to-menu" onclick="gameToMenu()">Menu</button>
+    </div>
+    <button id="music-toggle-game" onclick="toggleMute()">
+        <span id="mute-icon-game" class="material-icons">volume_off</span>
     </button>
-
-
-
 </div>
+
 <script src="global.js"></script>
+<script src="menu.js"></script>
 <script src="balls.js"></script>
 <script src="script.js"></script>
 </body>
