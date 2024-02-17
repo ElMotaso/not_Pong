@@ -10,7 +10,6 @@ body, html {
 #modes-menu, #pong-game, #menu, #stats-menu {
     display: none;
     position: relative;
-    justify-content: center;
     width: 320px;
     height: 480px;
     border: 2px solid white;
@@ -22,6 +21,7 @@ body, html {
 
 #menu, #modes-menu, #stats-menu {
     flex-direction: column;
+    justify-content: center;
     align-items: center;
     gap: 10px;
 }
