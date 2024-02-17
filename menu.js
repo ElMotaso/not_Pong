@@ -48,3 +48,26 @@ function modesToMenu() {
     menu.style.display = 'flex';
     modes.style.display = 'none';
 }
+
+function menuToStats() {
+    const menu = document.getElementById('menu');
+    const stats = document.getElementById('stats-menu');
+
+    const highScoreClassic = document.getElementById(
+        'highscoreClassic');
+    const highScoreChill = document.getElementById('highscoreChill');
+    const highScoreOverball = document.getElementById(
+        'highscoreOverball');
+    highScoreClassic.innerText = 'Classic: ' + classicHighScore;
+    highScoreChill.innerText = 'Chill: ' + chillHighScore;
+    highScoreOverball.innerText = 'Overball: ' + overballHighScore;
+    menu.style.display = 'none';
+    stats.style.display = 'flex';
+}
+
+function statsToMenu() {
+    const menu = document.getElementById('menu');
+    const stats = document.getElementById('stats-menu');
+    menu.style.display = 'flex';
+    stats.style.display = 'none';
+}

@@ -8,10 +8,10 @@
 <body>
 
 <div id="menu">
-    <h1>Game Title</h1>
+    <h1>not pong</h1>
     <button id="start-game" onclick="startClassic()">Start Game</button>
     <button id="modes" onclick="menuToModes()">Modes</button>
-    <button id="Stats">Stats</button>
+    <button id="Stats" onclick="menuToStats()">Stats</button>
     <audio id="background-music" loop autoplay muted>
         <source src="soundtrack.m4a" type="audio/mp4">
     </audio>
@@ -28,6 +28,19 @@
     <button id="modes-to-menu" onclick="modesToMenu()">Menu</button>
     <button id="music-toggle-modes" onclick="toggleMute()">
         <span id="mute-icon-modes" class="material-icons">volume_off</span>
+    </button>
+</div>
+
+<div id="stats-menu">
+    <h2>Highscores</h2>
+    <div id="highscores">
+        <div id="highscoreClassic"></div>
+        <div id="highscoreChill"></div>
+        <div id="highscoreOverball"></div>
+    </div>
+    <button id="stats-to-menu" onclick="statsToMenu()">Menu</button>
+    <button id="music-toggle-stats" onclick="toggleMute()">
+        <span id="mute-icon-stats" class="material-icons">volume_off</span>
     </button>
 </div>
 

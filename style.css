@@ -7,48 +7,59 @@ body, html {
     background-color: black;
 }
 
-#modes-menu, #pong-game, #menu {
+#modes-menu, #pong-game, #menu, #stats-menu {
     display: none;
     position: relative;
+    justify-content: center;
     width: 320px;
     height: 480px;
     border: 2px solid white;
     margin-top: 20px;
+    color: white;
+    font-family: Helvetica, sans-serif;
 }
 
 
-#menu {
-    display: flex;
+#menu, #modes-menu, #stats-menu {
     flex-direction: column;
     align-items: center;
     gap: 10px;
 }
 
-#start-game, #modes, #Stats, #restart, #game-to-menu {
-    background-color: transparent; /* Make the background invisible */
-    border: 2px solid white; /* White border */
-    border-radius: 20px; /* Rounded corners */
-    color: white; /* Text color */
-    padding: 10px 20px; /* Padding inside the buttons */
-    text-align: center; /* Center the text inside the button */
-    font-size: 16px; /* Text size */
-    cursor: pointer; /* Change mouse cursor on hover */
-    outline: none; /* Remove the outline to make it look cleaner */
-    transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effects */
+#menu {
+    display: flex;
+}
+
+#stats-menu {
+    text-align: left;
+    overflow-wrap: break-word;
+}
+
+#start-game, #modes, #Stats, #restart, #game-to-menu, #classic, #chill, #overball, #modes-to-menu, #stats-to-menu {
+    background-color: transparent;
+    border: 2px solid white;
+    border-radius: 20px;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 16px;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.3s, color 0.3s;
     height: 50px;
     width: 160px;
 }
 
 
 
-#start-game:hover, #modes:hover, #Stats:hover, #restart:hover, #game-to-menu:hover {
-    background-color: #414141; /* Slight background on hover */
-    color: #ffffff; /* Change text color slightly on hover */
+#start-game:hover, #modes:hover, #Stats:hover, #restart:hover, #game-to-menu:hover, #classic:hover, #chill:hover, #overball:hover, #modes-to-menu:hover, #stats-to-menu:hover {
+    background-color: #414141;
+    color: #ffffff;
 
 }
 
 .material-icons {
-    vertical-align: middle; /* Aligns icon vertically with text if any */
+    vertical-align: middle;
 }
 
 
@@ -134,6 +145,7 @@ body, html {
     width: 320px;
     height: 480px;
     gap: 10px;
+    font-family: Helvetica, sans-serif;
 }
 
 
@@ -143,7 +155,7 @@ body, html {
     margin-bottom: 10px;
 }
 
-#music-toggle-game, #music-toggle-menu, #music-toggle-modes {
+#music-toggle-game, #music-toggle-menu, #music-toggle-modes, #music-toggle-stats {
     position: absolute;
     top: 0;
     right: 0;
@@ -151,4 +163,10 @@ body, html {
     color: white;
     border: none;
     cursor: pointer;
+}
+
+#highscoreClassic, #highscoreChill, #highscoreOverball {
+    color: white;
+    font-size: 18px;
+    margin-bottom: 10px;
 }

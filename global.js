@@ -71,9 +71,11 @@ function toggleMute() {
     const iconGame = document.getElementById("mute-icon-game");
     const iconMenu = document.getElementById("mute-icon-menu");
     const iconModes = document.getElementById("mute-icon-menu");
+    const iconStats = document.getElementById("mute-icon-stats");
 
     music.muted = !music.muted;
     iconGame.textContent = music.muted ? 'volume_off' : 'volume_up';
     iconMenu.textContent = music.muted ? 'volume_off' : 'volume_up';
     iconModes.textContent = music.muted ? 'volume_off' : 'volume_up';
+    iconStats.textContent = music.muted ? 'volume_off' : 'volume_up';
 }
